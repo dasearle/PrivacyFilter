@@ -59,16 +59,16 @@ class PrivacyFilter:
         datadir = data['data_directory']
 
         fields = {
-            os.path.join(datadir, data['firstnames']): {"replacement": "<NAAM>",
+            os.path.join(datadir, data['firstnames']): {"replacement": "<NAME>",
                                                         "punctuation": None if nlp_filter else self._punctuation},
-            os.path.join(datadir, data['lastnames']): {"replacement": "<NAAM>",
+            os.path.join(datadir, data['lastnames']): {"replacement": "<NAME>",
                                                        "punctuation": None if nlp_filter else self._punctuation},
-            os.path.join(datadir, data['places']): {"replacement": "<PLAATS>", "punctuation": None},
-            os.path.join(datadir, data['streets']): {"replacement": "<ADRES>", "punctuation": None},
-            os.path.join(datadir, data['diseases']): {"replacement": "<AANDOENING>", "punctuation": None},
-            os.path.join(datadir, data['medicines']): {"replacement": "<MEDICIJN>", "punctuation": None},
-            os.path.join(datadir, data['nationalities']): {"replacement": "<NATIONALITEIT>", "punctuation": None},
-            os.path.join(datadir, data['countries']): {"replacement": "<LAND>", "punctuation": None},
+            os.path.join(datadir, data['places']): {"replacement": "<PLACE>", "punctuation": None},
+            os.path.join(datadir, data['streets']): {"replacement": "<ADDRESS>", "punctuation": None},
+            os.path.join(datadir, data['diseases']): {"replacement": "<DISEASE>", "punctuation": None},
+            os.path.join(datadir, data['medicines']): {"replacement": "<MEDICINE>", "punctuation": None},
+            os.path.join(datadir, data['nationalities']): {"replacement": "<NATIONALITY>", "punctuation": None},
+            os.path.join(datadir, data['countries']): {"replacement": "<COUNTRY>", "punctuation": None},
         }
 
         self.initialize(clean_accents=clean_accents,
@@ -87,16 +87,16 @@ class PrivacyFilter:
         # implementation of a token based algorithm.
         if not fields:
             fields = {
-                os.path.join('datasets', 'firstnames.csv'): {"replacement": "<NAAM>",
+                os.path.join('datasets', 'firstnames.csv'): {"replacement": "<NAME>",
                                                              "punctuation": None if nlp_filter else self._punctuation},
-                os.path.join('datasets', 'lastnames.csv'): {"replacement": "<NAAM>",
+                os.path.join('datasets', 'lastnames.csv'): {"replacement": "<NAME>",
                                                             "punctuation": None if nlp_filter else self._punctuation},
-                os.path.join('datasets', 'places.csv'): {"replacement": "<PLAATS>", "punctuation": None},
-                os.path.join('datasets', 'streets_Nederland.csv'): {"replacement": "<ADRES>", "punctuation": None},
-                os.path.join('datasets', 'diseases.csv'): {"replacement": "<AANDOENING>", "punctuation": None},
-                os.path.join('datasets', 'medicines.csv'): {"replacement": "<MEDICIJN>", "punctuation": None},
-                os.path.join('datasets', 'nationalities.csv'): {"replacement": "<NATIONALITEIT>", "punctuation": None},
-                os.path.join('datasets', 'countries.csv'): {"replacement": "<LAND>", "punctuation": None},
+                os.path.join('datasets', 'places.csv'): {"replacement": "<PLACE>", "punctuation": None},
+                os.path.join('datasets', 'streets_Nederland.csv'): {"replacement": "<ADDRESS>", "punctuation": None},
+                os.path.join('datasets', 'diseases.csv'): {"replacement": "<DISEASE>", "punctuation": None},
+                os.path.join('datasets', 'medicines.csv'): {"replacement": "<MEDICINE>", "punctuation": None},
+                os.path.join('datasets', 'nationalities.csv'): {"replacement": "<NATIONALITY>", "punctuation": None},
+                os.path.join('datasets', 'countries.csv'): {"replacement": "<COUNTRY>", "punctuation": None},
             }
 
         for field in fields:
@@ -114,10 +114,10 @@ class PrivacyFilter:
 
         if not nlp_filter:
             for name in self.file_to_list(os.path.join('datasets', 'firstnames.csv')):
-                self.keyword_processor_names.add_keyword(name, "<NAAM>")
+                self.keyword_processor_names.add_keyword(name, "<NAME>")
 
             for name in self.file_to_list(os.path.join('datasets', 'lastnames.csv')):
-                self.keyword_processor_names.add_keyword(name, "<NAAM>")
+                self.keyword_processor_names.add_keyword(name, "<NAME>")
 
         # Make the URL regular expression
         # https://stackoverflow.com/questions/827557/how-do-you-validate-a-url-with-a-regular-expression-in-python
@@ -176,7 +176,7 @@ class PrivacyFilter:
         if numbers_to_zero:
             return re.sub('\d', '0', text).strip()
         else:
-            return re.sub(r'\w*\d\w*', '<GETAL>', text).strip()
+            return re.sub(r'\w*\d\w*', '<NUMBER>', text).strip()
 
     @staticmethod
     def remove_times(text):
@@ -184,12 +184,12 @@ class PrivacyFilter:
 
     @staticmethod
     def remove_dates(text):
-        text = re.sub("\d{2}[- /.]\d{2}[- /.]\d{,4}", "<DATUM>", text)
+        text = re.sub("\d{2}[- /.]\d{2}[- /.]\d{,4}", "<DATE>", text)
 
         text = re.sub(
-            "(\d{1,2}[^\w]{,2}(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)"
+            "(\d{1,2}[^\w]{,2}(january|february|march|april|may|june|july|august|september|actober|november|december)"
             "([- /.]{,2}(\d{4}|\d{2}))?)",
-            "<DATUM>", text)
+            "<DATE>", text)
 
         text = re.sub(
             "(\d{1,2}[^\w]{,2}(jan|feb|mrt|apr|mei|jun|jul|aug|sep|okt|nov|dec))[- /.](\d{4}|\d{2})?",
@@ -209,7 +209,8 @@ class PrivacyFilter:
 
     @staticmethod
     def remove_postal_codes(text):
-        return re.sub(r"\b([0-9]{4}\s?[a-zA-Z]{2})\b", "<POSTCODE>", text)
+        return re.sub(r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][A-Ha-hK-Yk-y]?[0-9][A-Za-z0-9]?)|(([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z0-9]?)|(([A-Za-z][0-9][A-Ha-hK-Yk-y])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z0-9]?))))\s?[0-9][A-Za-z]{2})
+", "<POSTCODE>", text)
 
     @staticmethod
     def remove_accents(text):
@@ -273,7 +274,7 @@ class PrivacyFilter:
                 if self.numbers_to_zero:
                     replaced = "0"
                 else:
-                    replaced = "<GETAL>"
+                    replaced = "<NUMBER>"
             else:
                 replaced = word
 
