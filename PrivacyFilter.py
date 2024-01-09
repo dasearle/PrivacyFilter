@@ -317,7 +317,7 @@ class PrivacyFilter:
         if self.use_wordlist:
             text = self.filter_static(text)
 
-        return self.cleanup_text(text)
+        return text
 
     def filter_static(self, text):
         text = " " + text + " "
