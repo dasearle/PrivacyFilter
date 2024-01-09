@@ -295,7 +295,7 @@ class PrivacyFilter:
 
     @staticmethod
     def cleanup_text(result):
-        result = re.sub("<[A-Z _]+>", "<FILTERED>", result)
+        # result = re.sub("<[A-Z _]+>", "<FILTERED>", result)
         result = re.sub(" ([ ,.:;?!])", "\\1", result)
         result = re.sub(" +", " ", result)                          # remove multiple spaces
         result = re.sub("\n +", "\n", result)                       # remove space after newline
@@ -317,8 +317,8 @@ class PrivacyFilter:
         if self.use_wordlist:
             text = self.filter_static(text)
 
-        return text
-
+        return self.cleanup_text(text)
+    
     def filter_static(self, text):
         text = " " + text + " "
         text = self.filter_regular_expressions(text)
